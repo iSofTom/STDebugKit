@@ -3,6 +3,14 @@ STDebugKit
 
 Offer access to several debug tools from everywhere
 
+## Introduction
+
+STDebugKit Allow you to debug your app, even from a device !
+From every screen you'll have access to a little debug button that could open a debug center.
+In that center you'll find two kind of debug tools:
+* Global Tools : Tools that came with this component
+* Context Tools : Tools you can add from your app and that are context sensitives.
+
 ## Configuration
 
 First of all you need to choose the modules you want to enable.
@@ -19,13 +27,32 @@ For example you could add the below code in your prefix.pch file.
 #endif
 ```
 
-Then you have to configure the debug kit by add one instruction right before the return of your application:didFinishLaunchingWithOptions: method.
+Then you have to configure the debug kit by add one instruction right before the return of your _application:didFinishLaunchingWithOptions:_ method.
 
 ```
 DebugKitConfigure()
 ```
 
 That's all Folks, you're ready to debug your app !
+
+### Adding Context Tools
+
+Context tools are reachable only when the viewController that is associated to is visible.
+
+Here is how to add a context tool.
+In your _viewWillAppear:_ method, add:
+
+```
+DebugKitAdd(@"# Tool Name #", ^{
+        # Your action #
+    })
+```
+
+And in you _viewWillDisappear:_ method, add:
+
+```
+DebugKitRemove()
+```
 
 ### More Configuration
 
@@ -56,29 +83,29 @@ Allow several actions on your database
  
 Warning: This module use MagicalRecord.
 
-Enabled Key : _STDebugKitModuleCoreDataEnabled_
-Order Key : _STDebugKitModuleCoreDataOrder_
+* Enabled Key : _STDebugKitModuleCoreDataEnabled_
+* Order Key : _STDebugKitModuleCoreDataOrder_
 
 ### Slow Animations
 
 Allow to slow all the animations of your application in order to polish your UI.
 
-Enabled Key : _STDebugKitModuleSlowAnimationsEnabled_
-Order Key : _STDebugKitModuleSlowAnimationsOrder_
+* Enabled Key : _STDebugKitModuleSlowAnimationsEnabled_
+* Order Key : _STDebugKitModuleSlowAnimationsOrder_
 
 ### Infos
 
 Allow to display the informations from your project info.plist.
 
-Enabled Key : _STDebugKitModuleInfosEnabled_
-Order Key : _STDebugKitModuleInfosOrder_
+* Enabled Key : _STDebugKitModuleInfosEnabled_
+* Order Key : _STDebugKitModuleInfosOrder_
 
 ### Kill
 
 Allow to immediately kill the current app.
 
-Enabled Key : _STDebugKitModuleKillEnabled_
-Order Key : _STDebugKitModuleKillOrder_
+* Enabled Key : _STDebugKitModuleKillEnabled_
+* Order Key : _STDebugKitModuleKillOrder_
 
 ### More Modules Coming ...
 
