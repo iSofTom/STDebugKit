@@ -112,7 +112,8 @@ Allow to immediately kill the current app.
 ## Installation
 
 To include this component in your project, I recommend you to use [Cocoapods](http://cocoapods.org):
-_this component will be soon available via cocoapods_.
+* Add `pod "STDebugKit"` to your Podfile.
+* Add `pod "STDebugKit/CoreData"` to your Podfile if you want the CoreData module (It uses MagicalRecord).
 
 ## Contribution
 
