@@ -1,0 +1,33 @@
+//
+// Prefix header for all source files of the 'STDebugKitDemo' target in the 'STDebugKitDemo' project
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_4_0
+#warning "This project uses features only available in iOS SDK 4.0 and later."
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+
+    #define MR_SHORTHAND
+    #define MR_ENABLE_ACTIVE_RECORD_LOGGING 0
+    #import "CoreData+MagicalRecord.h"
+
+#ifdef DEBUG
+    #define STDebugKitButtonSize 30
+    #define STDebugKitModuleCoreDataEnabled
+    #define STDebugKitModuleSlowAnimationsEnabled
+    #define STDebugKitModuleInfosEnabled
+    #define STDebugKitModuleKillEnabled
+
+    #define STDebugKitModuleCoreDataOrder           1
+    #define STDebugKitModuleSlowAnimationsOrder     2
+    #define STDebugKitModuleInfosOrder              3
+
+    #import "STDebugKit.h"
+#endif
+
+#endif
