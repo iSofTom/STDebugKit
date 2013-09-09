@@ -31,8 +31,6 @@
 #import "STDebugKitModuleCoreData.h"
 #import "STDebugKit.h"
 
-#import "Person.h"
-
 @interface STDebugKitCoreDataDisplayViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic, strong) NSManagedObjectID* objectId;

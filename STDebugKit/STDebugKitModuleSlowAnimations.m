@@ -57,6 +57,8 @@
 {
     [super viewDidLoad];
     
+    [self.view setBackgroundColor:[UIColor whiteColor]];
+    
     self.title = @"Slow Animations";
     
     self.speedSwitch = [[UISwitch alloc] init];

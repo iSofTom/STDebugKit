@@ -94,20 +94,21 @@
     
     CAShapeLayer* s = [CAShapeLayer layer];
     
-    CGFloat q = STDebugKitButtonSize/4.0;
-    CGFloat c = STDebugKitButtonSize/2.0;
-    CGFloat w = STDebugKitButtonSize/16.0;
-    CGFloat r = STDebugKitButtonSize/8.0;
+    CGFloat s_2 = STDebugKitButtonSize/2.0;
+    CGFloat s_4 = STDebugKitButtonSize/4.0;
+    CGFloat s_8 = STDebugKitButtonSize/8.0;
+    CGFloat s_16 = STDebugKitButtonSize/16.0;
+    CGFloat s_32 = STDebugKitButtonSize/32.0;
     
     UIBezierPath* path = [UIBezierPath bezierPath];
-    [path moveToPoint:CGPointMake(q + w, c + q + w)];
-    [path addArcWithCenter:CGPointMake(q, c + q) radius:w * sqrtf(2) startAngle:M_PI_4 endAngle:-3*M_PI_4 clockwise:YES];
-    [path addLineToPoint:CGPointMake(c - w, c - w)];
-    [path addArcWithCenter:CGPointMake(c - w + r, c - w - r) radius:r * sqrtf(2) startAngle:3*M_PI_4 endAngle:-M_PI_4 clockwise:YES];
-    [path addLineToPoint:CGPointMake(c + r, c - w - w - r)];
-    [path addArcWithCenter:CGPointMake(c + r + w, c - w - r) radius:w * sqrtf(2) startAngle:-3*M_PI_4 endAngle:M_PI_4 clockwise:NO];
-    [path addLineToPoint:CGPointMake(c + w + r + r, c + w - r - r)];
-    [path addArcWithCenter:CGPointMake(c + w + r, c + w - r) radius:r * sqrtf(2) startAngle:-M_PI_4 endAngle:3*M_PI_4 clockwise:YES];
+    [path moveToPoint:CGPointMake(s_4 + s_16, s_2 + s_4 + s_16)];
+    [path addArcWithCenter:CGPointMake(s_4, s_2 + s_4) radius:s_16 * sqrtf(2) startAngle:M_PI_4 endAngle:-3*M_PI_4 clockwise:YES];
+    [path addLineToPoint:CGPointMake(s_2 - s_16, s_2 - s_16)];
+    [path addArcWithCenter:CGPointMake(s_2 + s_8, s_2 - s_8) radius:s_8 * sqrtf(2) startAngle:11*(M_PI/12.0) endAngle:-4*(M_PI/12.0) clockwise:YES];
+    [path addLineToPoint:CGPointMake(s_2 + s_8 - s_32, s_2 - s_8 - s_32)];
+    [path addLineToPoint:CGPointMake(s_2 + s_8 + s_32, s_2 - s_8 + s_32)];
+    [path addLineToPoint:CGPointMake(s_2 + s_8 + s_8 + s_32, s_2 - s_8 - s_16 - s_32)];
+    [path addArcWithCenter:CGPointMake(s_2 + s_8, s_2 - s_8) radius:s_8 * sqrtf(2) startAngle:-2*(M_PI/12.0) endAngle:7*(M_PI/12.0) clockwise:YES];
     [path closePath];
     
     [s setPath:path.CGPath];

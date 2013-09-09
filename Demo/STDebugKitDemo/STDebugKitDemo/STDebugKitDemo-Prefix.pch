@@ -17,7 +17,7 @@
     #import "CoreData+MagicalRecord.h"
 
 #ifdef DEBUG
-    #define STDebugKitButtonSize 30
+    #define STDebugKitButtonSize 40
     #define STDebugKitModuleCoreDataEnabled
     #define STDebugKitModuleSlowAnimationsEnabled
     #define STDebugKitModuleInfosEnabled
