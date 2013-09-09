@@ -38,6 +38,10 @@
 #define STDebugKitButtonSize 40
 #endif
 
+#ifndef STDebugKitButtonColor
+#define STDebugKitButtonColor [UIColor redColor]
+#endif
+
 @interface STDebugKit ()
 
 @property (nonatomic, strong) NSMutableDictionary* contextActions;
@@ -84,7 +88,7 @@
     
     CAShapeLayer* shape = [CAShapeLayer layer];
     [shape setPath:[UIBezierPath bezierPathWithOvalInRect:view.bounds].CGPath];
-    [shape setFillColor:[UIColor redColor].CGColor];
+    [shape setFillColor:STDebugKitButtonColor.CGColor];
     [view.layer addSublayer:shape];
     
     CAShapeLayer* shape2 = [CAShapeLayer layer];
@@ -112,7 +116,7 @@
     [path closePath];
     
     [s setPath:path.CGPath];
-    [s setFillColor:[UIColor redColor].CGColor];
+    [s setFillColor:STDebugKitButtonColor.CGColor];
     [view.layer addSublayer:s];
     
     UIPanGestureRecognizer* pan = [[UIPanGestureRecognizer alloc] initWithTarget:[self sharedDebugKit] action:@selector(handlePanGesture:)];

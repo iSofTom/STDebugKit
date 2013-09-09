@@ -31,10 +31,11 @@
 #import <UIKit/UIKit.h>
 
 /**
+ - Module Infos -
+ Allow to display the informations from your project info.plist
+ 
  In order to use it, you should add the below define right before first import of STDebugKit
- 
  #define STDebugKitModuleInfosEnabled
- 
  */
 @interface STDebugKitModuleInfos : UIViewController
 

@@ -31,10 +31,11 @@
 #import <Foundation/Foundation.h>
 
 /**
+ - Module Kill -
+ Allow to immediately kill the current app
+ 
  In order to use it, you should add the below define right before first import of STDebugKit
- 
  #define STDebugKitModuleKillEnabled
- 
  */
 @interface STDebugKitModuleKill : NSObject
 

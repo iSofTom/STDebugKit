@@ -31,10 +31,11 @@
 #import <UIKit/UIKit.h>
 
 /**
+ - Module Slow Animations -
+ Allow to slow all the animations of your application in order to polish your UI.
+ 
  In order to use it, you should add the below define right before first import of STDebugKit
- 
  #define STDebugKitModuleSlowAnimationsEnabled
- 
  */
 @interface STDebugKitModuleSlowAnimations : UIViewController
 

@@ -42,6 +42,11 @@
 #define DebugKitRemove()
 #endif
 
+/**
+ *	STDebugKit offer access from several debug tools from everywhere
+ *
+ *  To configure it, simply add DebugKitConfigure() right before the return of your application:DidFinishLaunchingWithOptions: method.
+ */
 @interface STDebugKit : NSObject
 
 + (void)configure;

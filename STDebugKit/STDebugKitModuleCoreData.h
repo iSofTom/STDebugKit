@@ -31,12 +31,18 @@
 #import <UIKit/UIKit.h>
 
 /**
+ - Module Core Data -
+ Allow several actions on your database
+ * Find objects based on a predicate
+ * Count objects of a specific entity
+ * Delete objects based on a predicate
+ * Clear all instances of an entity
+ 
+ This module use MagicalRecord.
+ 
  In order to use it, you should add the below define right before first import of STDebugKit
- 
  #define STDebugKitModuleCoreDataEnabled
- 
  */
-
 @interface STDebugKitModuleCoreData : UIViewController
 
 @end
