@@ -29,6 +29,7 @@
  ***********************************************************************************/
 
 #import "STDebugKitModuleInfos.h"
+#import "STDebugKit.h"
 
 @interface STDebugKitModuleInfos () <UITableViewDataSource, UITableViewDelegate>
 

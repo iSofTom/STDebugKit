@@ -79,10 +79,10 @@
 
 + (void)configure
 {
-    UIView* root = [[[[[UIApplication sharedApplication] delegate] window] rootViewController] view];
-    CGSize rootSize = root.bounds.size;
+    UIView* root = [[[UIApplication sharedApplication] delegate] window];
+    CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
     
-    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(rootSize.width - STDebugKitButtonSize, roundf(rootSize.height / 2.0 - STDebugKitButtonSize / 2.0), STDebugKitButtonSize, STDebugKitButtonSize)];
+    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(appFrame.origin.x, appFrame.origin.y, STDebugKitButtonSize, STDebugKitButtonSize)];
     [view setBackgroundColor:[UIColor clearColor]];
     [root addSubview:view];
     
@@ -163,21 +163,19 @@
     
     if (pan.state == UIGestureRecognizerStateEnded || pan.state == UIGestureRecognizerStateCancelled)
     {
-        UIView* parent = view.superview;
-        
         CGRect frame = view.frame;
-        CGSize parentSize = parent.bounds.size;
+        CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
         
-        if (frame.origin.x < parentSize.width / 2.0)
+        if (frame.origin.x < appFrame.size.width / 2.0)
         {
-            frame.origin.x = 0;
+            frame.origin.x = appFrame.origin.x;
         }
         else
         {
-            frame.origin.x = parentSize.width - frame.size.width;
+            frame.origin.x = appFrame.origin.x + appFrame.size.width - frame.size.width;
         }
         
-        frame.origin.y = MIN(MAX(frame.origin.y, 0), parentSize.height - frame.size.height);
+        frame.origin.y = MIN(MAX(frame.origin.y, appFrame.origin.y), appFrame.origin.y + appFrame.size.height - frame.size.height);
         
         if (!CGRectEqualToRect(view.frame, frame))
         {
@@ -199,6 +197,12 @@
     }
     
     UIViewController* root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+    
+    if ([root presentedViewController])
+    {
+        root = [root presentedViewController];
+    }
+    
     [root presentViewController:nav animated:YES completion:nil];
 }
 

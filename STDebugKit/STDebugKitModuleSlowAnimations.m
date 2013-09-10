@@ -29,6 +29,7 @@
  ***********************************************************************************/
 
 #import "STDebugKitModuleSlowAnimations.h"
+#import "STDebugKit.h"
 
 #import <QuartzCore/QuartzCore.h>
 
