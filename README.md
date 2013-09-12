@@ -69,7 +69,7 @@ You can specify the modules order:
 #define STDebugKitModuleInfosOrder              3
 ```
 
-You can choose the debug kit's button's size and color:
+You can choose the debug kit's button's size and colors:
 
 ```
 #define STDebugKitButtonSize 30

@@ -45,6 +45,16 @@
  */
 @interface STDebugKitModuleCoreData : UIViewController
 
+/**
+ * You can use the STDebugKitModuleCoreData with your own NSManagedObjectContext.
+ * The global module is always using the [NSManagedObjectContext defaultContext]
+ * but you can add a context core data module:
+ 
+ DebugKitAddViewController(@"CoreData", STDebugKitModuleCoreData, ^(id o){
+    [(STDebugKitModuleCoreData*)o setUsingContext:self.context];
+ });
+ 
+ */
 @property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
