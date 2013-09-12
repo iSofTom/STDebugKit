@@ -30,6 +30,8 @@
 
 #import "STDebugKitRootViewController.h"
 
+#import "STDebugKit_private.h"
+
 #import "STDebugTool.h"
 
 @interface STDebugKitRootViewController () <UITableViewDataSource, UITableViewDelegate>
@@ -95,7 +97,7 @@
 
 - (void)handleCloseTap:(id)sender
 {
-    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
+    [[STDebugKit sharedDebugKit] hideDebugKit];
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -137,7 +139,7 @@
         tool = [self.globalActions objectAtIndex:indexPath.row];
     }
     
-    cell.accessoryType = tool.type == STDebugToolTypeViewController ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
+    cell.accessoryType = (tool.toolClass ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone);
     cell.textLabel.text = [tool toolName];
     
     return cell;
@@ -173,18 +175,22 @@
         tool = [self.globalActions objectAtIndex:indexPath.row];
     }
     
-    if (tool.type == STDebugToolTypeViewController)
+    id o = nil;
+    
+    if (tool.toolClass)
     {
         UIViewController* vc = [[tool.toolClass alloc] init];
         [self.navigationController pushViewController:vc animated:YES];
+        o = vc;
     }
-    else
+    
+    if (tool.toolAction)
     {
-        dispatch_block_t action = tool.toolAction;
-        if (action)
-        {
-            action();
-        }
+        tool.toolAction(o);
+    }
+    
+    if (!o)
+    {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
     }
 }

@@ -36,7 +36,7 @@
 #ifdef STDebugKitModuleKillEnabled
 + (void)load
 {
-    STDebugTool* tool = [STDebugTool debugToolNamed:@"Kill" action:^{
+    STDebugTool* tool = [STDebugTool debugToolNamed:@"Kill" action:^(id o){
         exit(0);
     }];
 #ifdef STDebugKitModuleKillOrder

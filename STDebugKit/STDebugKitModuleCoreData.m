@@ -39,17 +39,19 @@
 @property (nonatomic, strong) NSMutableArray* attributesValues;
 @property (nonatomic, strong) NSMutableArray* relationships;
 @property (nonatomic, strong) NSMutableArray* relationshipsValues;
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
 
 @implementation STDebugKitCoreDataDisplayViewController
 
-- (id)initWithObjectID:(NSManagedObjectID*)objectId
+- (id)initWithObjectID:(NSManagedObjectID*)objectId inContext:(NSManagedObjectContext*)context
 {
     self = [super init];
     if (self)
     {
         self.objectId = objectId;
+        self.usingContext = context;
         
         self.attributes = [[NSMutableArray alloc] init];
         self.attributesValues = [[NSMutableArray alloc] init];
@@ -62,6 +64,13 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
     
     self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     [self.tableView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight)];
@@ -86,7 +95,7 @@
     [self.relationships removeAllObjects];
     [self.relationshipsValues removeAllObjects];
     
-    NSManagedObject* object = [[NSManagedObjectContext defaultContext] objectWithID:self.objectId];
+    NSManagedObject* object = [self.usingContext objectWithID:self.objectId];
     NSEntityDescription* entity = object.entity;
     
     NSDictionary* attributes = [entity attributesByName];
@@ -195,15 +204,15 @@
     }
     else
     {
-        if ([[self.relationshipsValues objectAtIndex:indexPath.row] isKindOfClass:[NSNull class]])
+        if ([[self.relationshipsValues objectAtIndex:indexPath.row] isKindOfClass:[NSManagedObjectID class]])
         {
-            [tableView deselectRowAtIndexPath:indexPath animated:YES];
+            NSManagedObjectID* objectId = [self.relationshipsValues objectAtIndex:indexPath.row];
+            STDebugKitCoreDataDisplayViewController* display = [[STDebugKitCoreDataDisplayViewController alloc] initWithObjectID:objectId inContext:self.usingContext];
+            [self.navigationController pushViewController:display animated:YES];
         }
         else
         {
-            NSManagedObjectID* objectId = [self.relationshipsValues objectAtIndex:indexPath.row];
-            STDebugKitCoreDataDisplayViewController* display = [[STDebugKitCoreDataDisplayViewController alloc] initWithObjectID:objectId];
-            [self.navigationController pushViewController:display animated:YES];
+            [tableView deselectRowAtIndexPath:indexPath animated:YES];
         }
     }
 }
@@ -237,6 +246,7 @@
 @property (nonatomic, strong) UIView* touchCatcherView;
 @property (nonatomic, strong) UIButton* selectedButton;
 @property (nonatomic, strong) UIButton* searchButton;
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
 
@@ -244,13 +254,14 @@
 
 NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choose Attribute";
 
-- (id)init
+- (id)initWithContext:(NSManagedObjectContext*)context
 {
     self = [super init];
     if (self)
     {
         self.data = [[NSMutableArray alloc] init];
         self.title = @"Find";
+        self.usingContext = context;
     }
     return self;
 }
@@ -258,6 +269,13 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -277,6 +295,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     [self.attributeButton setHidden:YES];
     
     self.textField = [[UITextField alloc] initWithFrame:CGRectMake(20, 140, self.view.bounds.size.width - 40, 30)];
+    [self.textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
     [self.textField setAutoresizingMask:(UIViewAutoresizingFlexibleWidth)];
     [self.textField setBorderStyle:UITextBorderStyleRoundedRect];
     [self.view addSubview:self.textField];
@@ -301,6 +320,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     [self.touchCatcherView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTouchCatcherTap:)]];
     
     self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 216, self.view.bounds.size.width, 216)];
+    [self.pickerView setBackgroundColor:[UIColor whiteColor]];
     [self.pickerView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin)];
     [self.view addSubview:self.pickerView];
     [self.pickerView setDataSource:self];
@@ -312,7 +332,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 {
     [self.data removeAllObjects];
     
-    NSManagedObjectModel* model = [NSManagedObjectContext defaultContext].persistentStoreCoordinator.managedObjectModel;
+    NSManagedObjectModel* model = self.usingContext.persistentStoreCoordinator.managedObjectModel;
     NSArray* entities = model.entities;
     
     for (NSEntityDescription* entity in entities)
@@ -331,7 +351,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette base n'a pas d'entités" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No Entity found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -340,7 +360,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     [self.data removeAllObjects];
     
     NSString* entityName = [self.entityButton titleForState:UIControlStateNormal];
-    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:[NSManagedObjectContext defaultContext]];
+    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:self.usingContext];
     NSDictionary* attributes = [entity attributesByName];
     
     for (NSString* attribute in [attributes allKeys])
@@ -359,7 +379,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette entité n'a pas d'attributs" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No attributes found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -367,30 +387,51 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 {
     NSString* entityName = [self.entityButton titleForState:UIControlStateNormal];
     NSString* attributeName = [self.attributeButton titleForState:UIControlStateNormal];
-    NSString* attributeValue = [self.textField text];
+    id attributeValue = [self.textField text];
     
-    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:[NSManagedObjectContext defaultContext]];
+    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:self.usingContext];
     Class entityClass = NSClassFromString([entity managedObjectClassName]);
+    
+    NSDictionary* attributes = [entity attributesByName];
+    NSAttributeDescription* attribute = [attributes objectForKey:attributeName];
+    NSAttributeType type = attribute.attributeType;
+    
+    if (type == NSInteger16AttributeType || type == NSInteger32AttributeType)
+    {
+        attributeValue = @([attributeValue integerValue]);
+    }
+    else if (type == NSFloatAttributeType)
+    {
+        attributeValue = @([attributeValue floatValue]);
+    }
+    else if (type == NSDoubleAttributeType)
+    {
+        attributeValue = @([attributeValue doubleValue]);
+    }
+    else if (type == NSBooleanAttributeType)
+    {
+        attributeValue = @([attributeValue boolValue]);
+    }
     
     NSManagedObject* object = nil;
     
     if ([attributeName isEqualToString:STDebugKitCoreDataFindViewControllerAttributeButtonText])
     {
-        object = [entityClass findFirst];
+        object = [entityClass findFirstInContext:self.usingContext];
     }
     else
     {
-        object = [entityClass findFirstWithPredicate:[NSPredicate predicateWithFormat:@"%K = %@", attributeName, attributeValue]];
+        object = [entityClass findFirstWithPredicate:[NSPredicate predicateWithFormat:@"%K = %@", attributeName, attributeValue] inContext:self.usingContext];
     }
     
     if (object)
     {
-        STDebugKitCoreDataDisplayViewController* display = [[STDebugKitCoreDataDisplayViewController alloc] initWithObjectID:object.objectID];
+        STDebugKitCoreDataDisplayViewController* display = [[STDebugKitCoreDataDisplayViewController alloc] initWithObjectID:object.objectID inContext:self.usingContext];
         [self.navigationController pushViewController:display animated:YES];
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Aucun objet n'a été trouvé" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No object found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -493,17 +534,19 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 @property (nonatomic, strong) UIButton* entityButton;
 @property (nonatomic, strong) UIView* touchCatcherView;
 @property (nonatomic, strong) UILabel* label;
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
 
 @implementation STDebugKitCoreDataCountViewController
 
-- (id)init
+- (id)initWithContext:(NSManagedObjectContext*)context
 {
     self = [super init];
     if (self)
     {
         self.data = [[NSMutableArray alloc] init];
+        self.usingContext = context;
         self.title = @"Count";
     }
     return self;
@@ -512,6 +555,13 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -540,6 +590,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     [self.touchCatcherView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTouchCatcherTap:)]];
     
     self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 216, self.view.bounds.size.width, 216)];
+    [self.pickerView setBackgroundColor:[UIColor whiteColor]];
     [self.pickerView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin)];
     [self.view addSubview:self.pickerView];
     [self.pickerView setDataSource:self];
@@ -551,7 +602,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 {
     [self.data removeAllObjects];
     
-    NSManagedObjectModel* model = [NSManagedObjectContext defaultContext].persistentStoreCoordinator.managedObjectModel;
+    NSManagedObjectModel* model = self.usingContext.persistentStoreCoordinator.managedObjectModel;
     NSArray* entities = model.entities;
     
     for (NSEntityDescription* entity in entities)
@@ -569,7 +620,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette base n'a pas d'entités" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No entity found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -621,10 +672,10 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
     
     NSString* entityName = [self.entityButton titleForState:UIControlStateNormal];
     
-    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:[NSManagedObjectContext defaultContext]];
+    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:self.usingContext];
     Class entityClass = NSClassFromString([entity managedObjectClassName]);
     
-    self.label.text = [NSString stringWithFormat:@"%i",[entityClass countOfEntities]];
+    self.label.text = [NSString stringWithFormat:@"%i",[entityClass countOfEntitiesWithContext:self.usingContext]];
 }
 
 - (NSInteger)numberOfComponentsInPickerView:(UIPickerView *)pickerView
@@ -659,6 +710,7 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 @property (nonatomic, strong) UIView* touchCatcherView;
 @property (nonatomic, strong) UIButton* selectedButton;
 @property (nonatomic, strong) UIButton* deleteButton;
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
 
@@ -666,12 +718,13 @@ NSString* const STDebugKitCoreDataFindViewControllerAttributeButtonText = @"Choo
 
 NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Choose Attribute";
 
-- (id)init
+- (id)initWithContext:(NSManagedObjectContext*)context
 {
     self = [super init];
     if (self)
     {
         self.data = [[NSMutableArray alloc] init];
+        self.usingContext = context;
         self.title = @"Delete";
     }
     return self;
@@ -680,6 +733,13 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -700,6 +760,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
     
     self.textField = [[UITextField alloc] initWithFrame:CGRectMake(20, 140, self.view.bounds.size.width - 40, 30)];
     [self.textField setAutoresizingMask:(UIViewAutoresizingFlexibleWidth)];
+    [self.textField setAutocapitalizationType:UITextAutocapitalizationTypeNone];
     [self.textField setBorderStyle:UITextBorderStyleRoundedRect];
     [self.view addSubview:self.textField];
     [self.textField setDelegate:self];
@@ -723,6 +784,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
     [self.touchCatcherView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTouchCatcherTap:)]];
     
     self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 216, self.view.bounds.size.width, 216)];
+    [self.pickerView setBackgroundColor:[UIColor whiteColor]];
     [self.pickerView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin)];
     [self.view addSubview:self.pickerView];
     [self.pickerView setDataSource:self];
@@ -734,7 +796,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
 {
     [self.data removeAllObjects];
     
-    NSManagedObjectModel* model = [NSManagedObjectContext defaultContext].persistentStoreCoordinator.managedObjectModel;
+    NSManagedObjectModel* model = self.usingContext.persistentStoreCoordinator.managedObjectModel;
     NSArray* entities = model.entities;
     
     for (NSEntityDescription* entity in entities)
@@ -753,7 +815,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette base n'a pas d'entités" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No entity found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -781,7 +843,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette entité n'a pas d'attributs" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No attributes found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -789,33 +851,66 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
 {
     NSString* entityName = [self.entityButton titleForState:UIControlStateNormal];
     NSString* attributeName = [self.attributeButton titleForState:UIControlStateNormal];
-    NSString* attributeValue = [self.textField text];
+    id attributeValue = [self.textField text];
     
-    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:[NSManagedObjectContext defaultContext]];
+    NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:self.usingContext];
     Class entityClass = NSClassFromString([entity managedObjectClassName]);
     
-    NSManagedObject* object = nil;
+    NSDictionary* attributes = [entity attributesByName];
+    NSAttributeDescription* attribute = [attributes objectForKey:attributeName];
+    NSAttributeType type = attribute.attributeType;
+    
+    if (type == NSInteger16AttributeType || type == NSInteger32AttributeType)
+    {
+        attributeValue = @([attributeValue integerValue]);
+    }
+    else if (type == NSFloatAttributeType)
+    {
+        attributeValue = @([attributeValue floatValue]);
+    }
+    else if (type == NSDoubleAttributeType)
+    {
+        attributeValue = @([attributeValue doubleValue]);
+    }
+    else if (type == NSBooleanAttributeType)
+    {
+        attributeValue = @([attributeValue boolValue]);
+    }
+    
+    NSArray* objects = nil;
     
     if ([attributeName isEqualToString:STDebugKitCoreDataDeleteViewControllerAttributeButtonText])
     {
-        object = [entityClass findFirst];
+        objects = @[[entityClass findFirstInContext:self.usingContext]];
     }
     else
     {
-        object = [entityClass findFirstWithPredicate:[NSPredicate predicateWithFormat:@"%K = %@", attributeName, attributeValue]];
+        objects = [entityClass findAllWithPredicate:[NSPredicate predicateWithFormat:@"%K = %@", attributeName, attributeValue] inContext:self.usingContext];
     }
     
-    if (object)
+    if (objects)
     {
-        [object deleteEntity];
+        for (NSManagedObject* object in objects)
+        {
+            [object deleteInContext:self.usingContext];
+        }
         
-        [[NSManagedObjectContext defaultContext] saveToPersistentStoreWithCompletion:^(BOOL success, NSError *error) {
-            [[[UIAlertView alloc] initWithTitle:@"Delete" message:@"Delete successfull" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
-        }];
+        void(^completion)(BOOL, NSError*) = ^(BOOL success, NSError *error) {
+            [[[UIAlertView alloc] initWithTitle:@"Delete successful" message:[NSString stringWithFormat:@"%i objects deleted", [objects count]] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        };
+        
+        if (self.usingContext == [NSManagedObjectContext defaultContext])
+        {
+            [self.usingContext saveToPersistentStoreWithCompletion:completion];
+        }
+        else
+        {
+            [self.usingContext saveOnlySelfWithCompletion:completion];
+        }
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Aucun objet n'a été trouvé" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No objects found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -918,6 +1013,7 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
 @property (nonatomic, strong) UIButton* entityButton;
 @property (nonatomic, strong) UIButton* clearButton;
 @property (nonatomic, strong) UIView* touchCatcherView;
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
 
 @end
 
@@ -925,12 +1021,13 @@ NSString* const STDebugKitCoreDataDeleteViewControllerAttributeButtonText = @"Ch
 
 NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Entities";
 
-- (id)init
+- (id)initWithContext:(NSManagedObjectContext*)context
 {
     self = [super init];
     if (self)
     {
         self.data = [[NSMutableArray alloc] init];
+        self.usingContext = context;
         self.title = @"Clear";
     }
     return self;
@@ -939,6 +1036,13 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
     
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
@@ -967,6 +1071,7 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
     [self.touchCatcherView addGestureRecognizer:[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleTouchCatcherTap:)]];
     
     self.pickerView = [[UIPickerView alloc] initWithFrame:CGRectMake(0, self.view.bounds.size.height - 216, self.view.bounds.size.width, 216)];
+    [self.pickerView setBackgroundColor:[UIColor whiteColor]];
     [self.pickerView setAutoresizingMask:(UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleTopMargin)];
     [self.view addSubview:self.pickerView];
     [self.pickerView setDataSource:self];
@@ -978,7 +1083,7 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
 {
     [self.data removeAllObjects];
     
-    NSManagedObjectModel* model = [NSManagedObjectContext defaultContext].persistentStoreCoordinator.managedObjectModel;
+    NSManagedObjectModel* model = self.usingContext.persistentStoreCoordinator.managedObjectModel;
     NSArray* entities = model.entities;
     
     [self.data addObject:STDebugKitCoreDataClearViewControllerAllEntitiesText];
@@ -998,7 +1103,7 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
     }
     else
     {
-        [[[UIAlertView alloc] initWithTitle:@"Erreur" message:@"Cette base n'a pas d'entités" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+        [[[UIAlertView alloc] initWithTitle:@"Error" message:@"No entity found" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
     }
 }
 
@@ -1014,7 +1119,7 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
         for (NSEntityDescription* entity in entities)
         {
             Class entityClass = NSClassFromString([entity managedObjectClassName]);
-            [entityClass truncateAll];
+            [entityClass truncateAllInContext:self.usingContext];
         }
     }
     else
@@ -1022,12 +1127,21 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
         NSEntityDescription* entity = [NSEntityDescription entityForName:entityName inManagedObjectContext:[NSManagedObjectContext defaultContext]];
         Class entityClass = NSClassFromString([entity managedObjectClassName]);
         
-        [entityClass truncateAll];
+        [entityClass truncateAllInContext:self.usingContext];
     }
     
-    [[NSManagedObjectContext defaultContext] saveToPersistentStoreWithCompletion:^(BOOL success, NSError *error) {
-        [[[UIAlertView alloc] initWithTitle:@"Clear" message:@"delete successfull" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
-    }];
+    void(^completion)(BOOL, NSError*) = ^(BOOL success, NSError *error) {
+        [[[UIAlertView alloc] initWithTitle:@"Clear successful" message:[NSString stringWithFormat:@"All objects deleted"] delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil] show];
+    };
+    
+    if (self.usingContext == [NSManagedObjectContext defaultContext])
+    {
+        [self.usingContext saveToPersistentStoreWithCompletion:completion];
+    }
+    else
+    {
+        [self.usingContext saveOnlySelfWithCompletion:completion];
+    }
 }
 
 - (void)displayPicker
@@ -1126,6 +1240,13 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
 {
     [super viewDidLoad];
     
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
+    
     self.title = @"CoreData";
     
     self.data = [[NSMutableArray alloc] init];
@@ -1173,24 +1294,26 @@ NSString* const STDebugKitCoreDataClearViewControllerAllEntitiesText = @"All Ent
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    NSManagedObjectContext* context = self.usingContext ?: [NSManagedObjectContext defaultContext];
+    
     if (indexPath.row == 0)
     {
-        STDebugKitCoreDataFindViewController* find = [[STDebugKitCoreDataFindViewController alloc] init];
+        STDebugKitCoreDataFindViewController* find = [[STDebugKitCoreDataFindViewController alloc] initWithContext:context];
         [self.navigationController pushViewController:find animated:YES];
     }
     else if (indexPath.row == 1)
     {
-        STDebugKitCoreDataCountViewController* count = [[STDebugKitCoreDataCountViewController alloc] init];
+        STDebugKitCoreDataCountViewController* count = [[STDebugKitCoreDataCountViewController alloc] initWithContext:context];
         [self.navigationController pushViewController:count animated:YES];
     }
     else if (indexPath.row == 2)
     {
-        STDebugKitCoreDataDeleteViewController* clear = [[STDebugKitCoreDataDeleteViewController alloc] init];
+        STDebugKitCoreDataDeleteViewController* clear = [[STDebugKitCoreDataDeleteViewController alloc] initWithContext:context];
         [self.navigationController pushViewController:clear animated:YES];
     }
     else if (indexPath.row == 3)
     {
-        STDebugKitCoreDataClearViewController* clear = [[STDebugKitCoreDataClearViewController alloc] init];
+        STDebugKitCoreDataClearViewController* clear = [[STDebugKitCoreDataClearViewController alloc] initWithContext:context];
         [self.navigationController pushViewController:clear animated:YES];
     }
 }

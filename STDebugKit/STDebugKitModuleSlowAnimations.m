@@ -58,6 +58,13 @@
 {
     [super viewDidLoad];
     
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
+    
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     self.title = @"Slow Animations";

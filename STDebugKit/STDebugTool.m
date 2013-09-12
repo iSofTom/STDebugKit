@@ -30,20 +30,13 @@
 
 #import "STDebugTool.h"
 
-@interface STDebugTool ()
-
-@property (nonatomic, assign) STDebugToolType type;
-
-@end
-
 @implementation STDebugTool
 
-+ (STDebugTool*)debugToolNamed:(NSString*)name action:(dispatch_block_t)action
++ (STDebugTool*)debugToolNamed:(NSString*)name action:(STDebugToolAction)action
 {
     STDebugTool* tool = [[STDebugTool alloc] init];
     tool.toolName = name;
     tool.toolAction = action;
-    tool.type = STDebugToolTypeAction;
     return tool;
 }
 
@@ -52,7 +45,6 @@
     STDebugTool* tool = [[STDebugTool alloc] init];
     tool.toolName = name;
     tool.toolClass = c;
-    tool.type = STDebugToolTypeViewController;
     return tool;
 }
 

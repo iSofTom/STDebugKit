@@ -30,21 +30,20 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSInteger, STDebugToolType)
-{
-    STDebugToolTypeViewController,
-    STDebugToolTypeAction,
-};
+typedef void(^STDebugToolAction)(id o);
 
 @interface STDebugTool : NSObject
 
-+ (STDebugTool*)debugToolNamed:(NSString*)name action:(dispatch_block_t)action;
++ (STDebugTool*)debugToolNamed:(NSString*)name action:(STDebugToolAction)action;
 + (STDebugTool*)debugToolNamed:(NSString*)name viewControllerClass:(Class)c;
 
 @property (nonatomic, strong) NSString* toolName;
-@property (nonatomic, strong) dispatch_block_t toolAction;
+
+@property (nonatomic, strong) STDebugToolAction toolAction;
+- (void)setToolAction:(STDebugToolAction)action;
+
 @property (nonatomic, strong) Class toolClass;
-@property (nonatomic, assign, readonly) STDebugToolType type;
+
 @property (nonatomic, assign) NSInteger order;
 
 @end

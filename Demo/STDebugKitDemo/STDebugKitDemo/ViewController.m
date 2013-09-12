@@ -32,12 +32,12 @@
     
     [self.tableView deselectRowAtIndexPath:[self.tableView indexPathForSelectedRow] animated:YES];
     
-    DebugKitAdd(@"Add Cell", ^{
+    DebugKitAddAction(@"Add Cell", ^(id o){
         self.numberOfLines = MIN(self.numberOfLines + 1, 10);
         [self.tableView reloadData];
     })
     
-    DebugKitAdd(@"Remove Cell", ^{
+    DebugKitAddAction(@"Remove Cell", ^(id o){
         self.numberOfLines = MAX(self.numberOfLines - 1, 0);
         [self.tableView reloadData];
     })

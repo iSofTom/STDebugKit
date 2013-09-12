@@ -43,6 +43,7 @@
 		9A4C979D17DDA58F00C91A27 /* STDebugKitModuleKill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDebugKitModuleKill.m; sourceTree = "<group>"; };
 		9A4C979F17DDA8A100C91A27 /* STDebugKitModuleInfos.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDebugKitModuleInfos.h; sourceTree = "<group>"; };
 		9A4C97A017DDA8A100C91A27 /* STDebugKitModuleInfos.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDebugKitModuleInfos.m; sourceTree = "<group>"; };
+		9A77634117E0E31A009334D3 /* STDebugKit_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = STDebugKit_private.h; sourceTree = "<group>"; };
 		9A91D12E17D618D700052352 /* STDebugKitDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = STDebugKitDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A91D13117D618D700052352 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		9A91D13317D618D700052352 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -165,6 +166,7 @@
 			children = (
 				9A91D15517D619EB00052352 /* STDebugKit.h */,
 				9A91D15617D619EB00052352 /* STDebugKit.m */,
+				9A77634117E0E31A009334D3 /* STDebugKit_private.h */,
 				9A91D15A17D61E8A00052352 /* STDebugKitRootViewController.h */,
 				9A91D15B17D61E8A00052352 /* STDebugKitRootViewController.m */,
 				9A91D16E17D639E300052352 /* STDebugTool.h */,

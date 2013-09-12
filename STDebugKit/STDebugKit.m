@@ -29,6 +29,7 @@
  ***********************************************************************************/
 
 #import "STDebugKit.h"
+#import "STDebugKit_private.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -42,14 +43,9 @@
 #define STDebugKitButtonColor [UIColor redColor]
 #endif
 
-@interface STDebugKit ()
-
-@property (nonatomic, strong) NSMutableDictionary* contextActions;
-@property (nonatomic, strong) NSMutableArray* globalActions;
-
-+ (STDebugKit*)sharedDebugKit;
-
-@end
+#ifndef STDebugKitButtonBackgroundColor
+#define STDebugKitButtonBackgroundColor [UIColor whiteColor]
+#endif
 
 @implementation STDebugKit
 
@@ -82,7 +78,7 @@
     UIView* root = [[[UIApplication sharedApplication] delegate] window];
     CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
     
-    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(appFrame.origin.x, appFrame.origin.y, STDebugKitButtonSize, STDebugKitButtonSize)];
+    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(appFrame.origin.x + appFrame.size.width - STDebugKitButtonSize, appFrame.origin.y + appFrame.size.height / 2.0 - STDebugKitButtonSize / 2.0, STDebugKitButtonSize, STDebugKitButtonSize)];
     [view setBackgroundColor:[UIColor clearColor]];
     [root addSubview:view];
     
@@ -93,7 +89,7 @@
     
     CAShapeLayer* shape2 = [CAShapeLayer layer];
     [shape2 setPath:[UIBezierPath bezierPathWithOvalInRect:CGRectInset(view.bounds, 2, 2)].CGPath];
-    [shape2 setFillColor:[UIColor whiteColor].CGColor];
+    [shape2 setFillColor:STDebugKitButtonBackgroundColor.CGColor];
     [view.layer addSublayer:shape2];
     
     CAShapeLayer* s = [CAShapeLayer layer];
@@ -124,6 +120,8 @@
     
     UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:[self sharedDebugKit] action:@selector(handleTapGesture:)];
     [view addGestureRecognizer:tap];
+    
+    [self sharedDebugKit].debugKitButton = view;
 }
 
 + (void)addGlobalDebugTool:(STDebugTool*)debugTool
@@ -188,22 +186,48 @@
 
 - (void)handleTapGesture:(UITapGestureRecognizer*)pan
 {
-    STDebugKitRootViewController* dkRoot = [[STDebugKitRootViewController alloc] initWithContextActions:self.contextActions globalActions:self.globalActions];
-    UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:dkRoot];
-    
-    if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+    if (self.debugKitViewController)
     {
-        nav.modalPresentationStyle = UIModalPresentationFormSheet;
+        [self hideDebugKit];
     }
-    
-    UIViewController* root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    
-    if ([root presentedViewController])
+    else
     {
-        root = [root presentedViewController];
+        [self displayDebugKit];
     }
-    
-    [root presentViewController:nav animated:YES completion:nil];
+}
+
+- (void)displayDebugKit
+{
+    if (!self.debugKitViewController)
+    {
+        STDebugKitRootViewController* dkRoot = [[STDebugKitRootViewController alloc] initWithContextActions:self.contextActions globalActions:self.globalActions];
+        UINavigationController* nav = [[UINavigationController alloc] initWithRootViewController:dkRoot];
+        
+        if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPad)
+        {
+            nav.modalPresentationStyle = UIModalPresentationFormSheet;
+        }
+        
+        UIViewController* root = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+        
+        if ([root presentedViewController])
+        {
+            root = [root presentedViewController];
+        }
+        
+        [root presentViewController:nav animated:YES completion:nil];
+        self.debugKitViewController = nav;
+    }
+}
+
+- (void)hideDebugKit
+{
+    if (self.debugKitViewController)
+    {
+        [self.debugKitViewController dismissViewControllerAnimated:YES completion:^{
+            self.debugKitViewController = nil;
+        }];
+    }
 }
 
 @end

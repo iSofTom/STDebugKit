@@ -34,11 +34,13 @@
 
 #ifdef DEBUG
 #define DebugKitConfigure() [STDebugKit configure];
-#define DebugKitAdd(n, a) [STDebugKit addContextDebugTool:[STDebugTool debugToolNamed:n action:a] forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
+#define DebugKitAddAction(n, a) [STDebugKit addContextDebugTool:[STDebugTool debugToolNamed:n action:a] forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
+#define DebugKitAddViewController(n, vc, a) {STDebugTool* tool = [STDebugTool debugToolNamed:n viewControllerClass:[vc class]];[tool setToolAction:a];[STDebugKit addContextDebugTool:tool forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];}
 #define DebugKitRemove() [STDebugKit removeContextDebugToolForKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
 #else
 #define DebugKitConfigure()
-#define DebugKitAdd(n, a)
+#define DebugKitAddAction(n, a)
+#define DebugKitAddViewController(n, vc, a)
 #define DebugKitRemove()
 #endif
 

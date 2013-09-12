@@ -10,10 +10,12 @@
 
 #import "Firm.h"
 #import "Person.h"
+#import "STDebugKitModuleCoreData.h"
 
 @interface SecondViewController ()
 
 @property (nonatomic, strong) NSString* name;
+@property (nonatomic, strong) NSManagedObjectContext* context;
 
 @end
 
@@ -33,15 +35,28 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    self.context = [NSManagedObjectContext contextWithParent:[NSManagedObjectContext contextWithParent:[NSManagedObjectContext defaultContext]]];
+    
+#ifdef __IPHONE_7_0
+    if ([self respondsToSelector:@selector(setEdgesForExtendedLayout:)])
+    {
+        self.edgesForExtendedLayout = UIRectEdgeNone;
+    }
+#endif
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
     
-    DebugKitAdd(@"Log Name", ^{
+    DebugKitAddAction(@"Log Name", ^(id o){
         [[[UIAlertView alloc] initWithTitle:@"Name" message:self.name delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
     })
+    
+    DebugKitAddViewController(@"CoreData", STDebugKitModuleCoreData, ^(id o){
+        [(STDebugKitModuleCoreData*)o setUsingContext:self.context];
+    });
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -53,7 +68,17 @@
 
 - (IBAction)handleButtonTap:(id)sender
 {
-    NSManagedObjectContext* context = [NSManagedObjectContext contextWithParent:[NSManagedObjectContext defaultContext]];
+    [self insertInContext:self.context];
+}
+
+- (IBAction)handleGlobalInsertButtonTap:(id)sender
+{
+    [self insertInContext:[NSManagedObjectContext defaultContext]];
+}
+
+- (void)insertInContext:(NSManagedObjectContext*)ctx
+{
+    NSManagedObjectContext* context = [NSManagedObjectContext contextWithParent:ctx];
     
     [context performBlock:^{
         Firm* firm = [Firm createInContext:context];
@@ -74,7 +99,14 @@
         person.age = @23;
         person.firm = firm;
         
-        [context saveToPersistentStoreWithCompletion:nil];
+        if (context == [NSManagedObjectContext defaultContext])
+        {
+            [context saveToPersistentStoreWithCompletion:nil];
+        }
+        else
+        {
+            [context saveOnlySelfWithCompletion:nil];
+        }
     }];
 }
 

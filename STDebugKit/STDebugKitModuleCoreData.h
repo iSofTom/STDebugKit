@@ -45,4 +45,6 @@
  */
 @interface STDebugKitModuleCoreData : UIViewController
 
+@property (nonatomic, strong) NSManagedObjectContext* usingContext;
+
 @end
