@@ -1,7 +1,7 @@
 STDebugKit
 ==========
 
-Offer access to several debug tools from everywhere
+Offer access to several debug tools within your app, such as CoreData browsing.
 
 ## Introduction
 
@@ -13,21 +13,7 @@ In that center you'll find two kind of debug tools:
 
 ## Configuration
 
-First of all you need to choose the modules you want to enable.
-For example you could add the below code in your prefix.pch file.
-
-```
-#ifdef DEBUG
-    #define STDebugKitModuleCoreDataEnabled
-    #define STDebugKitModuleSlowAnimationsEnabled
-    #define STDebugKitModuleInfosEnabled
-    #define STDebugKitModuleKillEnabled
-
-    #import "STDebugKit.h"
-#endif
-```
-
-Then you have to configure the debug kit by add one instruction right before the return of your _application:didFinishLaunchingWithOptions:_ method.
+All you have to do, is configure the debug kit by adding one instruction right before the return of your _application:didFinishLaunchingWithOptions:_ method. Don't forget to import `STDebugKit.h` for that, I recommend you to import it in your prefix.pch file.
 
 ```
 DebugKitConfigure()
@@ -43,8 +29,16 @@ Here is how to add a context tool.
 In your _viewWillAppear:_ method, add:
 
 ```
-DebugKitAdd(@"# Tool Name #", ^{
+DebugKitAddAction(@"# Tool Name #", ^(id o){
         # Your action #
+    })
+```
+
+You can also add an entire ViewController as a debug tool:
+
+```
+DebugKitAddAction(@"# Tool Name #", MyViewController, ^(id o){
+        # Your can configure your view controller here (via the block parameter) #
     })
 ```
 
@@ -55,6 +49,17 @@ DebugKitRemove()
 ```
 
 ### More Configuration
+
+In the prefix.pch file of the STDebugKit pod, you can do a lot of configurations.
+
+You can enable or disable the modules you want to appear:
+
+```
+#define STDebugKitModuleSlowAnimationsEnabled
+#define STDebugKitModuleInfosEnabled
+//#define STDebugKitModuleKillEnabled
+//The Kill module is now disabled
+```
 
 You can specify the modules order:
 
@@ -69,6 +74,7 @@ You can choose the debug kit's button's size and color:
 ```
 #define STDebugKitButtonSize 30
 #define STDebugKitButtonColor [UIColor colorWithRed:0.751 green:0.843 blue:0.900 alpha:1.000]
+#define STDebugKitButtonBackgroundColor [UIColor whiteColor]
 ```
 
 ## Modules

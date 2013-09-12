@@ -34,13 +34,13 @@
 
 #ifdef DEBUG
 #define DebugKitConfigure() [STDebugKit configure];
-#define DebugKitAddAction(n, a) [STDebugKit addContextDebugTool:[STDebugTool debugToolNamed:n action:a] forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
-#define DebugKitAddViewController(n, vc, a) {STDebugTool* tool = [STDebugTool debugToolNamed:n viewControllerClass:[vc class]];[tool setToolAction:a];[STDebugKit addContextDebugTool:tool forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];}
+#define DebugKitAddAction(name, block ...) [STDebugKit addContextDebugTool:[STDebugTool debugToolNamed:(name) action:(block)] forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
+#define DebugKitAddViewController(name, viewController, block ...) {STDebugTool* tool = [STDebugTool debugToolNamed:(name) viewControllerClass:[viewController class]];[tool setToolAction:(block)];[STDebugKit addContextDebugTool:tool forKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];}
 #define DebugKitRemove() [STDebugKit removeContextDebugToolForKey:[NSString stringWithFormat:@"%@-%p", NSStringFromClass([self class]), self]];
 #else
 #define DebugKitConfigure()
-#define DebugKitAddAction(n, a)
-#define DebugKitAddViewController(n, vc, a)
+#define DebugKitAddAction(name, block ...)
+#define DebugKitAddViewController(name, viewController, block ...)
 #define DebugKitRemove()
 #endif
 
