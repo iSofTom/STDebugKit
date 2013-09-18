@@ -18,5 +18,6 @@
 + (STDebugKit*)sharedDebugKit;
 
 - (void)hideDebugKit;
+- (void)hideDebugKitWithCompletion:(dispatch_block_t)completion;
 
 @end

@@ -11,6 +11,7 @@
 #import "Firm.h"
 #import "Person.h"
 #import "STDebugKitModuleCoreData.h"
+#import "STDebugKitModuleCoreDataViewer.h"
 
 @interface SecondViewController ()
 
@@ -54,9 +55,14 @@
         [[[UIAlertView alloc] initWithTitle:@"Name" message:self.name delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] show];
     })
     
-    DebugKitAddViewController(@"CoreData", STDebugKitModuleCoreData, ^(id o){
+    DebugKitAddViewController(@"CoreData Local", STDebugKitModuleCoreData, ^(id o){
         [(STDebugKitModuleCoreData*)o setUsingContext:self.context];
     });
+    
+    DebugKitAddViewController(@"Majority Viewer", STDebugKitModuleCoreDataPredicateViewer, ^(id o) {
+        [(STDebugKitModuleCoreDataPredicateViewer*)o setEntityClass:[Person class]];
+        [(STDebugKitModuleCoreDataPredicateViewer*)o setPredicate:[NSPredicate predicateWithFormat:@"age > 21"]];
+    })
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -99,7 +105,7 @@
         person.age = @23;
         person.firm = firm;
         
-        if (context == [NSManagedObjectContext defaultContext])
+        if (ctx == [NSManagedObjectContext defaultContext])
         {
             [context saveToPersistentStoreWithCompletion:nil];
         }

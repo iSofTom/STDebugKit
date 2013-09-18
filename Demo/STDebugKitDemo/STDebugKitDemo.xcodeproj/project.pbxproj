@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		95CBCEB51A6D46E191664DB3 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 29022429173840F5A8EE686F /* libPods.a */; };
+		9A22CDC717E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A22CDC617E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.m */; };
 		9A40C0EC17D8640500A3508F /* STDebugKitModuleCoreData.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A91D15E17D6218E00052352 /* STDebugKitModuleCoreData.m */; };
 		9A494E3517DDBE56003D5D21 /* STDebugKitModuleSlowAnimations.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A494E3417DDBE56003D5D21 /* STDebugKitModuleSlowAnimations.m */; };
 		9A4C979E17DDA59000C91A27 /* STDebugKitModuleKill.m in Sources */ = {isa = PBXBuildFile; fileRef = 9A4C979D17DDA58F00C91A27 /* STDebugKitModuleKill.m */; };
@@ -37,6 +38,8 @@
 /* Begin PBXFileReference section */
 		29022429173840F5A8EE686F /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B12E9FE0FA94CA3B0B7148C /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = ../Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
+		9A22CDC517E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDebugKitModuleCoreDataViewer.h; sourceTree = "<group>"; };
+		9A22CDC617E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDebugKitModuleCoreDataViewer.m; sourceTree = "<group>"; };
 		9A494E3317DDBE56003D5D21 /* STDebugKitModuleSlowAnimations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDebugKitModuleSlowAnimations.h; sourceTree = "<group>"; };
 		9A494E3417DDBE56003D5D21 /* STDebugKitModuleSlowAnimations.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = STDebugKitModuleSlowAnimations.m; sourceTree = "<group>"; };
 		9A4C979C17DDA58F00C91A27 /* STDebugKitModuleKill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = STDebugKitModuleKill.h; sourceTree = "<group>"; };
@@ -173,6 +176,8 @@
 				9A91D16F17D639E300052352 /* STDebugTool.m */,
 				9A91D15D17D6218E00052352 /* STDebugKitModuleCoreData.h */,
 				9A91D15E17D6218E00052352 /* STDebugKitModuleCoreData.m */,
+				9A22CDC517E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.h */,
+				9A22CDC617E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.m */,
 				9A4C979C17DDA58F00C91A27 /* STDebugKitModuleKill.h */,
 				9A4C979D17DDA58F00C91A27 /* STDebugKitModuleKill.m */,
 				9A4C979F17DDA8A100C91A27 /* STDebugKitModuleInfos.h */,
@@ -300,6 +305,7 @@
 				9A4C979E17DDA59000C91A27 /* STDebugKitModuleKill.m in Sources */,
 				9A4C97A117DDA8A100C91A27 /* STDebugKitModuleInfos.m in Sources */,
 				9A494E3517DDBE56003D5D21 /* STDebugKitModuleSlowAnimations.m in Sources */,
+				9A22CDC717E8BB2700811ECD /* STDebugKitModuleCoreDataViewer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -29,7 +29,7 @@
  ***********************************************************************************/
 
 #import "STDebugKitModuleSlowAnimations.h"
-#import "STDebugKit.h"
+#import "STDebugKit_private.h"
 
 #import <QuartzCore/QuartzCore.h>
 
@@ -82,7 +82,18 @@
 
 - (void)handleSwitchChange:(UISwitch*)s
 {
-    [[[[[UIApplication sharedApplication] windows] objectAtIndex:0] layer] setSpeed:(self.speedSwitch.isOn ? 0.1f : 1.0f)];
+    BOOL enableSlowAnimations = self.speedSwitch.isOn;
+    
+    if (enableSlowAnimations)
+    {
+        [[STDebugKit sharedDebugKit] hideDebugKitWithCompletion:^{
+            [[[[[UIApplication sharedApplication] windows] objectAtIndex:0] layer] setSpeed:0.1f];
+        }];
+    }
+    else
+    {
+        [[[[[UIApplication sharedApplication] windows] objectAtIndex:0] layer] setSpeed:1.0f];
+    }
 }
 
 @end

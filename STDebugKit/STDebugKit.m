@@ -39,6 +39,10 @@
 #define STDebugKitButtonSize 40
 #endif
 
+#ifndef STDebugKitButtonPosition
+#define STDebugKitButtonPosition CGPointMake(0,1)
+#endif
+
 #ifndef STDebugKitButtonColor
 #define STDebugKitButtonColor [UIColor redColor]
 #endif
@@ -77,8 +81,13 @@
 {
     UIView* root = [[[UIApplication sharedApplication] delegate] window];
     CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
+    CGPoint origin = STDebugKitButtonPosition;
+    origin.x = MAX(MIN(origin.x, 1), 0);
+    origin.y = MAX(MIN(origin.y, 1), 0);
     
-    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(appFrame.origin.x + appFrame.size.width - STDebugKitButtonSize, appFrame.origin.y + appFrame.size.height / 2.0 - STDebugKitButtonSize / 2.0, STDebugKitButtonSize, STDebugKitButtonSize)];
+    UIView* view = [[UIView alloc] initWithFrame:CGRectMake(appFrame.origin.x + (appFrame.size.width - STDebugKitButtonSize) * origin.x,
+                                                            appFrame.origin.y + (appFrame.size.height - STDebugKitButtonSize) * origin.y,
+                                                            STDebugKitButtonSize, STDebugKitButtonSize)];
     [view setBackgroundColor:[UIColor clearColor]];
     [root addSubview:view];
     
@@ -164,16 +173,37 @@
         CGRect frame = view.frame;
         CGRect appFrame = [[UIScreen mainScreen] applicationFrame];
         
-        if (frame.origin.x < appFrame.size.width / 2.0)
+        CGFloat x = 0;
+        CGFloat y = 0;
+        
+        if (frame.origin.x < (appFrame.size.width + appFrame.origin.x) / 2.0)
         {
-            frame.origin.x = appFrame.origin.x;
+            x = appFrame.origin.x;
         }
         else
         {
-            frame.origin.x = appFrame.origin.x + appFrame.size.width - frame.size.width;
+            x = appFrame.origin.x + appFrame.size.width - frame.size.width;
         }
         
-        frame.origin.y = MIN(MAX(frame.origin.y, appFrame.origin.y), appFrame.origin.y + appFrame.size.height - frame.size.height);
+        if (frame.origin.y < (appFrame.size.height + appFrame.origin.y) / 2.0)
+        {
+            y = appFrame.origin.y;
+        }
+        else
+        {
+            y = appFrame.origin.y + appFrame.size.height - frame.size.height;
+        }
+        
+        if (fabsf(x - frame.origin.x) < fabsf(y - frame.origin.y))
+        {
+            frame.origin.x = x;
+            frame.origin.y = MIN(MAX(frame.origin.y, appFrame.origin.y), appFrame.origin.y + appFrame.size.height - frame.size.height);
+        }
+        else
+        {
+            frame.origin.y = y;
+            frame.origin.x = MIN(MAX(frame.origin.x, appFrame.origin.x), appFrame.origin.x + appFrame.size.width - frame.size.width);
+        }
         
         if (!CGRectEqualToRect(view.frame, frame))
         {
@@ -222,10 +252,19 @@
 
 - (void)hideDebugKit
 {
+    [self hideDebugKitWithCompletion:nil];
+}
+
+- (void)hideDebugKitWithCompletion:(dispatch_block_t)completion
+{
     if (self.debugKitViewController)
     {
         [self.debugKitViewController dismissViewControllerAnimated:YES completion:^{
             self.debugKitViewController = nil;
+            if (completion)
+            {
+                completion();
+            }
         }];
     }
 }
